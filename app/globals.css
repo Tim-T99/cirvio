@@ -14,7 +14,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #000000;
     --foreground: #ededed;
   }
 }
@@ -24,3 +24,20 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.btn-upload {
+  @apply flex items-center justify-center gap-3 max-w-fit cursor-pointer rounded-xl border-2 border-blue-700 bg-blue-700/30 px-4 py-2 m-5 text-blue-700 font-medium transition-all duration-300 hover:bg-blue-700/20 hover:text-white;
+}
+
+.upload-file {
+  @apply flex items-center justify-center gap-3 max-w-fit cursor-pointer rounded-xl border-2 border-orange-700 bg-orange-500/30 px-4 py-2 m-5 text-orange-700 font-medium transition-all duration-300 hover:bg-orange-700/20 hover:text-white;
+}
+.btn-upload-outline .upload-icon {
+  @apply w-6 h-6 text-blue-700/70 transition-colors group-hover:text-white;
+}
+
+.input{
+  @apply bg-gray-800 px-4 py-2 rounded-xl w-[90%] max-h-fit
+}
+
+
