@@ -3,7 +3,7 @@ import NavLinks from "./nav-links";
 
 export default function SideNav() {
   return (
-    <div className="flex h-[95%] flex-col px-3 py-4 md:px-2 bg-gray-700 m-5 rounded-md">
+    <div className="flex h-[95%] flex-col px-3 py-4 md:px-2 bg-emerald-800/10 border-1 border-hunterGreen m-5 rounded-md">
       <Link
         className="mb-2 flex h-20 items-end justify-start rounded-md p-4 md:h-40"
         href="/"

@@ -1,0 +1,30 @@
+-- CREATE TABLE employees (
+--     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+--     company_id UUID,
+--     department_id UUID,
+--     team_id UUID,
+--     first_name VARCHAR(100) NOT NULL,
+--     middle_name VARCHAR(100),
+--     last_name VARCHAR(100) NOT NULL,
+--     email VARCHAR(255),
+--     phone VARCHAR(20),
+--     role VARCHAR(50),
+--     employment_type VARCHAR(50),
+--     status VARCHAR(50),
+--     joined_at DATE,
+--     created_at TIMESTAMPTZ DEFAULT NOW()
+-- );
+
+-- CREATE TABLE user_roles (
+-- role_id int,
+-- role VARCHAR(255)
+-- )
+-- INSERT INTO user_roles (role_id, role) 
+-- VALUES
+-- (0, 'super_admin'), 
+-- (1, 'admin'), 
+-- (2, 'manager'), 
+-- (3, 'employee');
+
+-- ALTER TABLE user_roles
+-- ADD PRIMARY KEY (role_id);
