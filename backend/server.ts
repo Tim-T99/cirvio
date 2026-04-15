@@ -9,8 +9,24 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS
+      : ['http://localhost:4200'];
+    console.log('Request Origin:', origin);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 }));
+
 app.use(express.json());
 const pgPool = new Pool({
   user: process.env.PG_USER,
@@ -28,19 +44,7 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello from the backend server!');
 });
 
-app.post('/api/signup', async (req: Request, res: Response) => {
-  const { formData } = req.body;
-  try {
-    const result = await pgPool.query(
-      'INSERT INTO users (email, username, password) VALUES ($1, $2, $3) RETURNING id',
-      [formData.email, formData.username, formData.password]
-    );
-    res.status(201).json({ userId: result.rows[0].id });
-  } catch (error) {
-    console.error('Error signing up user:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
