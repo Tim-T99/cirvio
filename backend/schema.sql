@@ -103,29 +103,30 @@
 -- );
 
 
--- //Cleaned up version//
+                                -- //Cleaned up version//
+                                
 -- ============================================================
 -- EXTENSIONS
 -- ============================================================
 
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
 -- ============================================================
 -- USER ROLES
 -- ============================================================
 
-CREATE TABLE user_roles (
-    role_id INT         PRIMARY KEY,
-    role    VARCHAR(255)
-);
+-- CREATE TABLE user_roles (
+--     role_id INT         PRIMARY KEY,
+--     role    VARCHAR(255)
+-- );
 
-INSERT INTO user_roles (role_id, role)
-VALUES
-    (0, 'super_admin'),
-    (1, 'admin'),
-    (2, 'manager'),
-    (3, 'employee');
+-- INSERT INTO user_roles (role_id, role)
+-- VALUES
+--     (0, 'super_admin'),
+--     (1, 'admin'),
+--     (2, 'manager'),
+--     (3, 'employee');
 
 
 -- ============================================================
