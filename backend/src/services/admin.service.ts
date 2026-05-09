@@ -5,7 +5,7 @@
 // No tenantId scoping — operates across all tenants
 // ─────────────────────────────────────────────
 
-import { prisma } from '../prisma/client'
+import { prisma } from '../src/prisma/client'
 import { AdminRole, TenantStatus } from '@prisma/client'
 import { hashPassword, comparePassword, hashToken } from '../../utils/hash'
 import { signToken } from '../../utils/jwt'
