@@ -80,7 +80,7 @@ export const requestPasswordReset = async (req: Request, res: Response): Promise
 
 export const resetPassword = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { token } = req.params
+    const token = req.params.token as string
     const { newPassword } = req.body
     if (!newPassword) {
       res.status(400).json({ error: 'New password is required' })
@@ -157,7 +157,7 @@ export const updateUserRole = async (req: Request, res: Response): Promise<void>
       return
     }
     const updated = await userService.updateUserRole(
-      req.params.userId,
+      req.params.userId as string,
       req.user!.tenantId,
       role,
       req.user!.userId

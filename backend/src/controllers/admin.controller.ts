@@ -81,7 +81,7 @@ export const listAdmins = async (_req: Request, res: Response): Promise<void> =>
 
 export const updateAdmin = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { adminId } = req.params
+    const adminId = req.params.adminId as string
     const { name, role, isActive } = req.body
 
     const updated = await adminService.updateAdmin(adminId, { name, role, isActive })
@@ -147,7 +147,7 @@ export const getTenant = async (req: Request, res: Response): Promise<void> => {
 
 export const updateTenantStatus = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { tenantId } = req.params
+    const tenantId = req.params.tenantId as string
     const { status, reason } = req.body
     const adminId = req.admin!.adminId
 
@@ -170,7 +170,7 @@ export const updateTenantStatus = async (req: Request, res: Response): Promise<v
 
 export const changeTenantPlan = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { tenantId } = req.params
+    const tenantId = req.params.tenantId as string
     const { planId } = req.body
     const adminId = req.admin!.adminId
 

@@ -85,7 +85,7 @@ export const revokeInvite = async (req: Request, res: Response): Promise<void> =
 
 export const validateInvite = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { token } = req.params
+    const token = req.params.token as string
     const invite = await tenantService.validateInvite(token)
     res.status(200).json({
       email: invite.email,
@@ -100,7 +100,7 @@ export const validateInvite = async (req: Request, res: Response): Promise<void>
 
 export const acceptInvite = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { token } = req.params
+    const token = req.params.token as string
     const { firstName, lastName, password } = req.body
 
     if (!firstName || !lastName || !password) {
