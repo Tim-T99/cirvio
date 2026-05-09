@@ -12,7 +12,6 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  url        = env("DATABASE_URL")
   extensions = [pgcrypto]
 }
 
@@ -356,6 +355,8 @@ model Employee {
   passportNumber   String?
   passportExpiry   DateTime?
   labourCardNo     String?
+  wpsPersonId      String?        // MOHRE-assigned WPS person ID
+  wpsBankCode      String?        // bank routing code for SIF file
 
   // Salary (for WPS correlation)
   basicSalaryAed   Float?
