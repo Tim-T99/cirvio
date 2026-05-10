@@ -218,8 +218,8 @@ model Tenant {
   industry             String?      // e.g. "Logistics", "Construction", "Retail"
 
   // Subscription
-  planId               String       @db.Uuid
-  plan                 Plan         @relation(fields: [planId], references: [id])
+  planId               String?      @db.Uuid
+  plan                 Plan?        @relation(fields: [planId], references: [id])
   status               TenantStatus @default(TRIAL)
   trialEndsAt          DateTime?
   subscriptionEndsAt   DateTime?

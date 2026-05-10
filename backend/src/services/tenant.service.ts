@@ -8,7 +8,8 @@
 
 import { prisma } from '../prisma/client'
 import { UserRole, TenantStatus } from '@prisma/client'
-import { hashToken } from '../../utils/hash'
+import { hashToken, hashPassword } from '../../utils/hash'
+import { signToken } from '../../utils/jwt'
 import crypto from 'crypto'
 
 
@@ -26,6 +27,98 @@ import crypto from 'crypto'
 // [S4] Plan limit enforcement happens at the
 //      service layer, not just the frontend.
 // ─────────────────────────────────────────────
+
+
+// ─────────────────────────────────────────────
+// TENANT REGISTRATION (public)
+// Creates Tenant + first TENANT_ADMIN user in
+// a single transaction, returns a session token
+// ─────────────────────────────────────────────
+
+export const registerTenant = async (data: {
+  organizationName: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+}) => {
+  // Check email uniqueness across all users
+  const existingUser = await prisma.user.findFirst({ where: { email: data.email } })
+  if (existingUser) {
+    throw new Error('An account with this email already exists')
+  }
+
+  // Derive URL-safe slug from org name
+  const baseSlug = data.organizationName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    || 'workspace'
+
+  const slugTaken = await prisma.tenant.findUnique({ where: { slug: baseSlug } })
+  const slug = slugTaken ? `${baseSlug}-${Date.now()}` : baseSlug
+
+  // Use the cheapest available plan for trial (optional — plan may not exist yet)
+  const defaultPlan = await prisma.plan.findFirst({ orderBy: { priceAed: 'asc' } })
+
+  const passwordHash = await hashPassword(data.password)
+
+  const { tenant, user } = await prisma.$transaction(async (tx: typeof prisma) => {
+    const tenant = await tx.tenant.create({
+      data: {
+        name: data.organizationName,
+        slug,
+        email: data.email,
+        status: 'ACTIVE',
+        trialEndsAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14), // 14-day trial
+        ...(defaultPlan && { planId: defaultPlan.id }),
+      },
+    })
+
+    const user = await tx.user.create({
+      data: {
+        tenantId: tenant.id,
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        passwordHash,
+        role: 'TENANT_ADMIN',
+        isActive: true,
+      },
+    })
+
+    return { tenant, user }
+  })
+
+  const token = signToken({ userId: user.id, tenantId: tenant.id, role: user.role })
+  const hashedToken = hashToken(token)
+
+  await prisma.userSession.create({
+    data: {
+      userId: user.id,
+      token: hashedToken,
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 8),
+    },
+  })
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      tenantId: tenant.id,
+      tenant: {
+        id: tenant.id,
+        name: tenant.name,
+        slug: tenant.slug,
+        status: tenant.status,
+      },
+    },
+  }
+}
 
 
 // ─────────────────────────────────────────────
@@ -117,6 +210,7 @@ export const assertEmployeeLimit = async (tenantId: string) => {
   })
 
   if (!tenant) throw new Error('Tenant not found')
+  if (!tenant.plan) return  // no plan assigned yet — no limit to enforce
 
   if (tenant._count.employees >= tenant.plan.maxEmployees) {
     throw new Error(
@@ -135,6 +229,7 @@ export const assertUserLimit = async (tenantId: string) => {
   })
 
   if (!tenant) throw new Error('Tenant not found')
+  if (!tenant.plan) return  // no plan assigned yet — no limit to enforce
 
   if (tenant._count.users >= tenant.plan.maxAdmins) {
     throw new Error(

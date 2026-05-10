@@ -13,7 +13,8 @@ import { requireRole } from '../middleware/role.middleware'
 
 const router = Router()
 
-// ── Public — invite validation + acceptance ──
+// ── Public ──
+router.post('/register', tenantCtrl.register)
 router.get('/invites/validate/:token', tenantCtrl.validateInvite)
 router.post('/invites/accept/:token', tenantCtrl.acceptInvite)
 

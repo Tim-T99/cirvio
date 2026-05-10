@@ -7,6 +7,33 @@ import { Request, Response } from 'express'
 import * as tenantService from '../services/tenant.service'
 
 
+export const register = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { organizationName, firstName, lastName, email, password } = req.body
+    if (!organizationName || !firstName || !lastName || !email || !password) {
+      res.status(400).json({ error: 'All fields are required' })
+      return
+    }
+    if (password.length < 8) {
+      res.status(400).json({ error: 'Password must be at least 8 characters' })
+      return
+    }
+    if (!/\d/.test(password)) {
+      res.status(400).json({ error: 'Password must contain a number' })
+      return
+    }
+    const result = await tenantService.registerTenant({ organizationName, firstName, lastName, email, password })
+    res.status(201).json(result)
+  } catch (err) {
+    const message = (err as Error).message
+    if (message.includes('already exists')) {
+      res.status(409).json({ error: message })
+      return
+    }
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const tenant = await tenantService.getTenantProfile(req.user!.tenantId)
